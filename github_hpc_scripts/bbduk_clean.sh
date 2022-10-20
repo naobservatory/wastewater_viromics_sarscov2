@@ -77,4 +77,5 @@ for f in $(\
     ~/bbmap/bbduk.sh "${args[@]}"
     aws s3 cp $out1 s3://prjna729801/$out1
     aws s3 cp $out2 s3://prjna729801/$out2
+    rm $in1 $in2 $out1 $out2
 done
