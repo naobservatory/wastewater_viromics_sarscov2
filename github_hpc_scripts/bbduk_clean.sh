@@ -12,7 +12,7 @@ for f in $(\
     stats="${f}_bbduk_stats1.txt"
     refstats="${f}_bbduk_ref_stats1.txt"
     aws s3 cp "s3://prjna729801/$in1" $in1
-    aws s3 cp "s3://prjna729801/$in1" $in2
+    aws s3 cp "s3://prjna729801/$in2" $in2
     # wget https://sourceforge.net/projects/bbmap/files/\
     #              BBMap_39.01.tar.gz/download \
     #              -O BBMap_39.01.tar.gz
