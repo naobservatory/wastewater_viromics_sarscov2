@@ -1,0 +1,2 @@
+Run ./prepare_metadata.sh to download Rothman (2021) metadata from ENA and
+parse it.
