@@ -11,12 +11,28 @@
 #SBATCH --error=slurm-%J.err ## error log file
 #SBATCH --output=slurm-%J.out ##output info file
 
-module load bbmap/38.87
-for f in $(ls *_READ1.clean.fastq.gz | sed 's/_READ1.clean.fastq.gz//' | sort -u)
-do
-dedupe.sh \
-in=${f}_READ1.clean.fastq.gz \
-in2=${f}_READ2.clean.fastq.gz \
-out=${f}.dedupe.fastq.gz \
-threads=60
+for f in $(\
+           # https://github.com/jeffkaufman/kmer-egd
+           cat ~/kmer-egd/rothman.unenriched_samples | \
+               awk '{print $1}' | \
+               sed 's/_.*//' | \
+               sort -u); do
+    in1="${f}_1.clean.fastq.gz"
+    in2="${f}_2.clean.fastq.gz"
+    out="${f}.dedup.fastq.gz"
+
+    if aws s3 ls s3://prjna729801/$out ; then
+        continue
+    fi
+
+    aws s3 cp "s3://prjna729801/$in1" $in1
+    aws s3 cp "s3://prjna729801/$in2" $in2
+
+    ~/bbmap/dedupe.sh \
+        in=$in1 \
+        in2=$in2 \
+        out=$out \
+        threads=32
+    aws s3 cp $out s3://prjna729801/$out
+    rm $in1 $in2 $out
 done
