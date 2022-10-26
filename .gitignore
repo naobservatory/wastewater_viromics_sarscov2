@@ -1,5 +1,8 @@
 SRR*_bbduk_*stats1.txt
 *.sa
+*.bt2
 *.bt2.tmp
 *.fna
 flag.*
+*.gz
+*.sam
