@@ -1,15 +1,24 @@
 #!/bin/bash
-#--------------------------SBATCH settings------
 
-#SBATCH --job-name=bowtie2_build      ## job name
-#SBATCH -A katrine_lab     ## account to charge
-#SBATCH -p standard          ## partition/queue name
-#SBATCH --nodes=1            ## (-N) number of nodes to use
-#SBATCH --ntasks=1           ## (-n) number of tasks to launch
-#SBATCH --cpus-per-task=30    ## number of cores the job needs
-#SBATCH --error=slurm-%J.err ## error log file
-#SBATCH --output=slurm-%J.out ##output info file
 
-module load bowtie2
+if [ ! -e flag.db_downloaded ]; then
+    curl https://ftp.ncbi.nlm.nih.gov/refseq/release/viral/ -sS | \
+        grep -E -o 'viral[.][0-9.]+[.]genomic.fna.gz' | \
+        sort | uniq | \
+        xargs -P 32 -I {} wget \
+              https://ftp.ncbi.nlm.nih.gov/refseq/release/viral/{}
+    touch flag.db_downloaded
+fi
 
-bowtie2-build all_virus_genomes.fna all_virus_genomes_bowtie_db -f --threads 30 
+if [ ! -e flag.gunzipped ]; then
+    gunzip *.genomic.fna.gz
+    touch flag.gunzipped
+fi
+
+if [ ! -e all_virus_genomes_bowtie_db ]; then
+    ~/bowtie2-2.4.5-linux-x86_64/bowtie2-build $(ls *.fna | tr '\n' ',') \
+         all_virus_genomes_bowtie_db -f --threads 30
+   rm *.fna
+fi
+
+
