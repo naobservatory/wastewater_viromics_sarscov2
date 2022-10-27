@@ -1,18 +1,22 @@
 #!/bin/bash
-#--------------------------SBATCH settings------
 
-#SBATCH --job-name=sam_to_bam_converter      ## job name
-#SBATCH -A katrine_lab     ## account to charge
-#SBATCH -p standard          ## partition/queue name
-#SBATCH --nodes=1            ## (-N) number of nodes to use
-#SBATCH --ntasks=1           ## (-n) number of tasks to launch
-#SBATCH --cpus-per-task=30    ## number of cores the job needs
-#SBATCH --error=slurm-%J.err ## error log file
-#SBATCH --output=slurm-%J.out ##output info file
+for f in $(aws s3 ls s3://prjna729801/ | \
+               awk '{print $NF}' | \
+               grep _all_viruses.sam.gz$ | \
+               sed s/_all_viruses.sam.gz//); do
+    in_gz="${f}_all_viruses.sam.gz"
+    in="${f}_all_viruses.sam"
+    out="${f}_all_viruses.bam"
+    out_gz="${f}_all_viruses.bam.gz"
 
-module load samtools
+    aws s3 cp "s3://prjna729801/$in_gz" $in_gz
+    gunzip $in_gz
 
-for f in $(ls *.sam | sed 's/.sam//' | sort -u)
-do
-samtools view -S ${f}.sam -@ 30 -b > ${f}.bam 
+    samtools view -S $in -@ 30 -b > $out
+
+    gzip $out
+    aws s3 cp $out_gz s3://prjna729801/$out_gz
+
+    rm $in
+    rm $out_gz
 done
