@@ -1,22 +1,26 @@
 #!/bin/bash
-#--------------------------SBATCH settings------
 
-#SBATCH --job-name=instrain_run      ## job name
-#SBATCH -A katrine_lab     ## account to charge
-#SBATCH -p standard          ## partition/queue name
-#SBATCH --nodes=1            ## (-N) number of nodes to use
-#SBATCH --ntasks=1           ## (-n) number of tasks to launch
-#SBATCH --cpus-per-task=30    ## number of cores the job needs
-#SBATCH --error=slurm-%J.err ## error log file
-#SBATCH --output=slurm-%J.out ##output info file
+for f in $(aws s3 ls s3://prjna729801/ | \
+               awk '{print $NF}' | \
+               grep _all_viruses.sorted_bam.gz$ | \
+               sed s/_all_viruses.sorted_bam.gz//); do
+    in_gz="${f}_all_viruses.sorted_bam.gz"
+    in="${f}_all_viruses.sorted_bam"
+    in_b="${f}_all_viruses.sorted.bam"
+    out="${f}_instrain"
+    out_zip="${f}_instrain.zip"
 
+    aws s3 cp "s3://prjna729801/$in_gz" $in_gz
+    gunzip $in_gz
+    mv $in $in_b
 
-module load anaconda/2020.07
+    inStrain profile $in_b -l 0.9 -p 30 all_virus_genomes.fna -o $out
 
-eval "$(conda shell.bash hook)"
+    zip -r $out_zip $out
+    aws s3 cp $out_zip s3://prjna729801/$out_zip
 
-conda activate instrain
-for f in $(ls *_sorted.bam | sed 's/_sorted.bam//' | sort -u)
-do
-inStrain profile ${f}_sorted.bam -l 0.9 -p 30 all_virus_genomes.fna -o ${f}_instrain 
+    rm $in_b
+    rm $in_b.bai
+    rm $out_zip
+    rm -r $out
 done
