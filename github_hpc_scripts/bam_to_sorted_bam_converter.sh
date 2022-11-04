@@ -1,5 +1,4 @@
 #!/bin/bash
-#--------------------------SBATCH settings------
 
 for f in $(aws s3 ls s3://prjna729801/ | \
                awk '{print $NF}' | \
