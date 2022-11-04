@@ -72,6 +72,9 @@ for f in $(\
         # sequence adapters is when your fragment is shorter than your read
         # length, and so you've sequenced the same fragment twice.
         tbo
+        # Rothman doesn't include something like trimpolygright=7, and I think
+        # probably should have?  Lots of reads end in poly-g tails due to the
+        # color chemistry of the sequencer.
         threads=30
         )
     ~/bbmap/bbduk.sh "${args[@]}"
