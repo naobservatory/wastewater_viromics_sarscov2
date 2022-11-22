@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for f in $(aws s3 ls s3://prjna729801/ | \
                awk '{print $NF}' | \

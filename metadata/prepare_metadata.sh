@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ENDPOINT="https://www.ebi.ac.uk/ena/portal/api/filereport"
 ACCESSION="PRJNA729801"

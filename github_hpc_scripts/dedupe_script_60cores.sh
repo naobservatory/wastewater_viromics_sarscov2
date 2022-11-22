@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #--------------------------SBATCH settings------
 
 #SBATCH --job-name=bbduk_dedupe      ## job name

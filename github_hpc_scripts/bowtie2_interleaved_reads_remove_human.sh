@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ ! -e grch38_1kgmaj.1.bt2 ]; then
     if [ ! -e grch38_1kgmaj.zip ] ; then

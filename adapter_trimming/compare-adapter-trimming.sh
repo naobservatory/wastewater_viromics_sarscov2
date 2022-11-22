@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for accession in \
     $(cat ../metadata/parsed_metadata.tsv | \
@@ -13,7 +13,7 @@ for accession in \
     if [ ! -e $in1 ] ; then
         aws s3 cp "s3://prjna729801/$in1" $in1
     fi
-    if [ ! -e $in2;] ; then
+    if [ ! -e $in2 ] ; then
         aws s3 cp "s3://prjna729801/$in2" $in2
     fi
 

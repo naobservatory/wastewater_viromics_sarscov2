@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ ! -e all_virus_genomes.fna ]; then
     curl https://ftp.ncbi.nlm.nih.gov/refseq/release/viral/ -sS | \

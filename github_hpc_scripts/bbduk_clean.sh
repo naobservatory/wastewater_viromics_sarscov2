@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 for f in $(\
            # https://github.com/jeffkaufman/kmer-egd
            cat ~/kmer-egd/rothman.unenriched_samples | \

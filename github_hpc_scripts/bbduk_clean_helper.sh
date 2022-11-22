@@ -1,7 +1,10 @@
+#!/usr/bin/env bash
+
 in1="$1"
 in2="$2"
 out1="$3"
 out2="$4"
+
 
 args=(
     in=$in1
