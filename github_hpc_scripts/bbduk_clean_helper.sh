@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+if [ $# -lt 4 ]; then
+    echo "Usage: $0 in1 in2 out1 out2"
+    exit 1
+fi
+
 in1="$1"
 in2="$2"
 out1="$3"
 out2="$4"
-
 
 args=(
     in=$in1
@@ -64,6 +68,9 @@ args=(
     # Rothman doesn't include something like trimpolygright=7, and I think
     # probably should have?  Lots of reads end in poly-g tails due to the
     # color chemistry of the sequencer.
+    #
+    # Actually, you should only get into a polyg tail after going through an
+    # adapter, so I think polyg trimming isn't needed.
     threads=30
 )
 
