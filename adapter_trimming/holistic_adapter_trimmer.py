@@ -131,8 +131,7 @@ def start(fname_in, fname_out):
 
     with open(fname_in) as inf:
         with open(fname_out, 'w') as outf:
-            #run(fname_in, inf, outf, adapter_rc, n_records)
-            outf.write("test")
+            run(fname_in, inf, outf, adapter_rc, n_records)
 
 if __name__ == "__main__":
     start(*sys.argv[1:])
