@@ -38,11 +38,13 @@ def determine_barcode(fname, handle, regex):
     barcode_top, count_top = barcodes.most_common(n=2)[0]
     barcode_ntop, count_ntop = barcodes.most_common(n=2)[1]
 
-    if count_top/count_ntop < 50:
+    if count_top/count_ntop < 15:
         raise Exception(
-            "%s: most common barcode (%s, %s) appears only %sx as often as "
+            "%s: most common barcode (%s, %s) appears only %.2fx as often as "
             "next most common (%s, %s)." % (
-                barcode_top, count_top, count_top/count_ntop,
+                fname,
+                barcode_top, count_top,
+                count_top/count_ntop,
                 barcode_ntop, count_ntop))
 
     return barcode_top, n_records
@@ -79,12 +81,15 @@ def trim_ends(seq, qal):
 
     return seq, qal
 
-def run(inf, outf, adapter_rc, n_records):
+def run(fname_in, inf, outf, adapter_rc, n_records):
     for n_record, (title, seq, qal) in enumerate(FastqGeneralIterator(inf)):
-        if n_record % 1000 == 0:
+        if False and n_record % 1000 == 0:
             print("\rprogress: ... %.0f%% (%s/%s)" % (
                 n_record/n_records*100, n_record, n_records), end="")
-        
+        if True and n_record % 10000 == 0:
+            print("%s: %.0f%% (%s/%s)" % (
+                fname_in, n_record/n_records*100, n_record, n_records))
+
         loc = adapter_index(seq, adapter_rc)
         if loc is not None:
             seq = seq[:loc]
@@ -93,7 +98,7 @@ def run(inf, outf, adapter_rc, n_records):
         seq, qal = trim_ends(seq, qal)
 
         outf.write("@%s\n%s\n+\n%s\n" % (title, seq, qal))
-    print("\ncomplete")
+    print("\n %s complete" % fname_in)
 
 def start(fname_in, fname_out):
     is_fwd = "_1." in fname_in
@@ -103,15 +108,17 @@ def start(fname_in, fname_out):
         (True, False): "fwd",
         (False, True): "rev",
     }[is_fwd, is_rev]
-    
+
     regex = {
         "fwd": FWD_BC_REGEX,
         "rev": REV_BC_REGEX,
     }[fwd_rev]
-        
+
     with open(fname_in) as inf:
         barcode, n_records = determine_barcode(fname_in, inf, regex)
 
+    print ("%s: %s (%s)" % (fname_in, barcode, n_records))
+        
     adapter_rc = {
         "fwd": "%s%s%s" % (PRIMER2_RC, barcode, P7_RC),
         "rev": "%s%s%s" % (PRIMER1_RC, barcode, P5_RC),
@@ -124,7 +131,8 @@ def start(fname_in, fname_out):
 
     with open(fname_in) as inf:
         with open(fname_out, 'w') as outf:
-            run(inf, outf, adapter_rc, n_records)
+            #run(fname_in, inf, outf, adapter_rc, n_records)
+            outf.write("test")
 
 if __name__ == "__main__":
     start(*sys.argv[1:])
