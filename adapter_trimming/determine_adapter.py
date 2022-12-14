@@ -22,24 +22,27 @@ def determine_barcode(fname, handle, regex):
     for title, seq, qal in FastqGeneralIterator(handle):
         matches = regex.findall(seq)
         if matches:
-            match, = matches
+            match = matches[0]
             barcodes[match] += 1
 
     if not barcodes:
         raise Exception("%s: no matches for %s" % (
             fname, regex))
 
-    barcode_top, count_top = barcodes.most_common(n=2)[0]
-    barcode_ntop, count_ntop = barcodes.most_common(n=2)[1]
+    top_two = barcodes.most_common(n=2)
+    barcode_top, count_top = top_two[0]
 
-    if count_top/count_ntop < 15:
-        raise Exception(
-            "%s: most common barcode (%s, %s) appears only %.2fx as often as "
-            "next most common (%s, %s)." % (
-                fname,
-                barcode_top, count_top,
-                count_top/count_ntop,
-                barcode_ntop, count_ntop))
+    if len(top_two) > 1:
+        barcode_ntop, count_ntop = top_two[1]
+
+        if count_top/count_ntop < 15:
+            raise Exception(
+                "%s: most common barcode (%s, %s) appears only %.2fx as often as "
+                "next most common (%s, %s)." % (
+                    fname,
+                    barcode_top, count_top,
+                    count_top/count_ntop,
+                    barcode_ntop, count_ntop))
 
     return barcode_top
 
@@ -55,14 +58,14 @@ def start(fname_in, fwd_rev):
     }[fwd_rev]
 
     regex = re.compile("%s([ACGT]{10})%s" % (primer_rc, flow_cell_binder_rc))
-    
+
     inf = sys.stdin if fname_in == "-" else open(fname_in)
     barcode = determine_barcode(fname_in, inf, regex)
 
     if sys.stdout.isatty():
         # Make prettier output if presenting to a user.
         barcode = COLOR_RED + barcode + COLOR_END
-    
+
     print("%s%s%s" % (primer_rc, barcode, flow_cell_binder_rc))
 
 if __name__ == "__main__":
